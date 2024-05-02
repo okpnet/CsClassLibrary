@@ -9,6 +9,11 @@ namespace Zipper
 {
     public class ZipFactory
     {
+        /// <summary>
+        /// 平坦なZIP作成
+        /// </summary>
+        /// <param name="source"></param>
+        /// <returns></returns>
         public byte[] CreateZip(IReadOnlyDictionary<string, byte[]> source)
         {
             using var zipmem = new System.IO.MemoryStream();
