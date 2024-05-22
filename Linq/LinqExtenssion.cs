@@ -20,5 +20,16 @@ namespace LinqExtenssions
         {
             return source.GroupBy(predicate).Where(t=>t.Count()>1).Select(t=>t.Key);
         }
+        /// <summary>
+        /// NULL除外
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="source"></param>
+        /// <returns></returns>
+        public static IEnumerable<T> WhereNotNull<T>(this IEnumerable<T> source)
+        {
+            if (source == null) return Enumerable.Empty<T>();
+            return source.Where(x => x != null)!;
+        }
     }
 }
