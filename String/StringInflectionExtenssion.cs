@@ -55,5 +55,19 @@ namespace StringExtenssions
 
             return plural;
         }
+
+        public static string ToFormatStr(this string value,params object[] argments)
+        {
+            var result = string.Empty;
+            try
+            {
+                result=string.Format(value, argments);
+            }
+            finally
+            {
+                result=result == null || result== "" ? value:result;
+            }
+            return result;
+        } 
     }
 }
