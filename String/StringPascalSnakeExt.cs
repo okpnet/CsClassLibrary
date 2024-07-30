@@ -2,8 +2,10 @@
 
 namespace StringExtenssions
 {
-    public static class StringPascalSnakeExt
+    public static partial class StringPascalSnakeExt
     {
+        [System.Text.RegularExpressions.GeneratedRegex("_")]
+        private static partial System.Text.RegularExpressions.Regex SnakeCaseRegex();
         /// <summary>
         /// スネークケースをパスカルケースに変換
         /// </summary>
@@ -11,8 +13,9 @@ namespace StringExtenssions
         /// <returns></returns>
         public static string ToPascalFromSnake(this string str)
         {
-            if (str is null || str == "") return str;
-            var splits = System.Text.RegularExpressions.Regex.Split(str, "_");
+            if (str is (null or "")) return str??string.Empty;
+
+            var splits = SnakeCaseRegex().Split(str);
             var result = splits.Aggregate((a, b) =>
             {
                 var value = "";
@@ -32,5 +35,7 @@ namespace StringExtenssions
             });
             return result;
         }
+
+
     }
 }
