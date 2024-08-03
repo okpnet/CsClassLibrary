@@ -16,6 +16,11 @@ namespace StringExtenssions
             if (str is (null or "")) return str??string.Empty;
 
             var splits = SnakeCaseRegex().Split(str);
+            if (splits.Length == 1)
+            {
+                var value = splits[0];
+                return value[0].ToString().ToUpper() + value.Substring(1);
+            }
             var result = splits.Aggregate((a, b) =>
             {
                 var value = "";
