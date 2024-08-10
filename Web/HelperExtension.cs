@@ -199,18 +199,6 @@ namespace RenderTreeBuildHelper
             sequence = seq;
         }
         /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="builder"></param>
-        /// <param name="sequence"></param>
-        /// <param name="markupStrings"></param>
-        public static void AddContentsHelper(this RenderTreeBuilder builder, ref int sequence, MarkupString markupStrings)
-        {
-            var seq = sequence;
-            builder.AddContent(seq++, markupStrings);
-            sequence = seq;
-        }
-        /// <summary>
         /// Specify the content to include RenderFragment.
         /// </summary>
         /// <param name="builder"></param>
@@ -221,18 +209,6 @@ namespace RenderTreeBuildHelper
         {
             var seq = sequence;
             builder.AddAttribute(seq++, contentName,(RenderFragment)(action.Invoke));
-            sequence = seq;
-        }
-        /// <summary>
-        /// Specify ‘ChildContent’ containing child elements.
-        /// </summary>
-        /// <param name="builder"></param>
-        /// <param name="sequence"></param>
-        /// <param name="action"></param>
-        public static void AddChildContentsHelper<TRenderflagment>(this RenderTreeBuilder builder, ref int sequence,  Action<RenderTreeBuilder> action) 
-        {
-            var seq = sequence;
-            builder.AddAttribute(seq++, ATTR_CHILD_CONTENT, (RenderFragment)(action.Invoke));
             sequence = seq;
         }
         /// <summary>
