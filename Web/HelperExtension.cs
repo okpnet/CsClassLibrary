@@ -186,6 +186,19 @@ namespace RenderTreeBuildHelper
             sequence = seq;
         }
         /// <summary>
+        /// Specify the content to include RenderFragment.
+        /// </summary>
+        /// <param name="builder"></param>
+        /// <param name="sequence"></param>
+        /// <param name="contentName"></param>
+        /// <param name="action"></param>
+        public static void AddContentsHelper(this RenderTreeBuilder builder, ref int sequence, MarkupString markupString)
+        {
+            var seq = sequence;
+            builder.AddContent(seq++,markupString);
+            sequence = seq;
+        }
+        /// <summary>
         /// 
         /// </summary>
         /// <param name="builder"></param>
