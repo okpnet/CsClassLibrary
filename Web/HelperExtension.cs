@@ -223,6 +223,12 @@ namespace RenderTreeBuildHelper
             builder.AddAttribute(seq++, ATTR_CHILD_CONTENT, (RenderFragment)(action.Invoke));
             sequence = seq;
         }
+        public static void AddChildContentsHelper<T>(this RenderTreeBuilder builder, ref int sequence, Func<T,Action<RenderTreeBuilder>> action)
+        {
+            var seq = sequence;
+            builder.AddAttribute(seq++, ATTR_CHILD_CONTENT, (RenderFragment<T>)((object)action));
+            sequence = seq;
+        }
         /// <summary>
         /// Specify ‘ChildContent’ containing child elements.
         /// </summary>
