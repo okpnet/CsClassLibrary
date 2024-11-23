@@ -1,6 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.WebSockets;
+using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -50,6 +53,62 @@ namespace ListExtensions
             {
                 Replace(source, indexs.Item1, indexs.Item2);
             }
+        }
+        /// <summary>
+        /// The list moves a part of to a specified position.caution : index start is 0.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="source"></param>
+        /// <param name="insert"></param>
+        /// <param name="replacements"></param>
+        /// <exception cref="NotFiniteNumberException"></exception>
+        public static void InsertReplace<T>(this IList<T> source,int insert,IEnumerable<T> replacements)
+        {
+            if( !replacements.Any(t => source.Contains(t)))
+            {
+                throw new NotFiniteNumberException($"No 'replacements' subobjects in source.");
+            }
+
+            var indexs = replacements.Select(source.IndexOf).OrderBy(t => t).ToArray();
+            for(var index =0;indexs.Length>index;index++ )
+            {
+                InsertReplace(source, insert + index, indexs[index]);
+            }
+        }
+        /// <summary>
+        /// The list moves a part of to a specified position.caution : index start is 0.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="source"></param>
+        /// <param name="insert"></param>
+        /// <param name="replace"></param>
+        /// <exception cref="IndexOutOfRangeException"></exception>
+        public static void InsertReplace<T>(this IList<T> source, int insert,int replace)
+        {
+            if( insert == replace)
+            {
+                return;
+            }
+
+            if(0 > insert || insert > source.Count - 1)
+            {
+                throw new IndexOutOfRangeException($"'{insert}' argment is less 0 or greater than numer of list.");
+            }
+            if(0> replace || replace>source.Count - 1)
+            {
+                throw new IndexOutOfRangeException($"'{replace}' argment is less 0 or greater than numer of list.");
+            }
+            var range = replace > insert? replace - insert : insert - replace;
+            var startIndex = replace > insert ? insert : replace + 1;
+            var offset = replace > insert ? 1 : -1;
+            var temps = new T[range];
+            Array.Copy(source.ToArray(), startIndex, temps, 0, range);
+            source[replace > insert ? insert : insert] = source[replace];
+            for(var index = 0; range > index; index++)
+            {
+                source[startIndex + index + offset] = temps[index];
+            }
+
         }
     }
 }

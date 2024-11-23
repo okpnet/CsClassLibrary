@@ -241,12 +241,12 @@ namespace RenderTreeBuildHelper
             builder.AddAttribute(seq++, contentName, (RenderFragment)(action.Invoke));
             sequence = seq;
         }
-        public static void AddChildContentsHelper(this RenderTreeBuilder builder, ref int sequence, Action<RenderTreeBuilder> action)
-        {
-            var seq = sequence;
-            builder.AddAttribute(seq++, ATTR_CHILD_CONTENT, (RenderFragment)(action.Invoke));
-            sequence = seq;
-        }
+        //public static void AddChildContentsHelper(this RenderTreeBuilder builder, ref int sequence, Action<RenderTreeBuilder> action)
+        //{
+        //    var seq = sequence;
+        //    builder.AddAttribute(seq++, ATTR_CHILD_CONTENT, (RenderFragment)(action.Invoke));
+        //    sequence = seq;
+        //}
         /// <summary>
         /// add mouse event to element and specify call back function for fire. 
         /// <param name="builder"></param>
