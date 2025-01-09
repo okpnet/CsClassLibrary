@@ -23,5 +23,23 @@ namespace LinqExtenssions
             foreach(var item in source)action(item);
             return source;
         }
+
+        /// <summary>
+        /// 親探索
+        /// </summary>
+        /// <param name="parent"></param>
+        /// <returns></returns>
+        public static IEnumerable<T> GetAncester<T>(IEnumerable<T> list, T? self, Func<IEnumerable<T>, T, T?> getParent)
+        {
+            if (self is null)
+            {
+                yield break;
+            }
+            yield return self;
+            foreach (var result in GetAncester(list, getParent(list, self), getParent))
+            {
+                yield return result;
+            }
+        }
     }
 }
