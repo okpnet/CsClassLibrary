@@ -109,5 +109,66 @@ namespace LinqExtenssions
             }
             return value;
         }
+        /// <summary>
+        /// オブジェクトから値の取得
+        /// </summary>
+        /// <param name="expression"></param>
+        /// <returns></returns>
+        /// <exception cref="InvalidOperationException"></exception>
+        public static Tval? GetValue(Expression<Func<Tval>> expression)
+        {
+            if (expression.Body is not MemberExpression member)
+            {
+                throw new InvalidOperationException("No support member");
+            }
+            var inst = GetInstanceHelper(member);
+            var exp = member.Member;
+            return exp switch
+            {
+                FieldInfo field => (Tval?)field.GetValue(inst),
+                PropertyInfo property => (Tval?)property.GetValue(inst),
+                _ => throw new InvalidOperationException("No support member")
+            };
+        }
+        /// <summary>
+        /// オブジェクトへ値のセット
+        /// </summary>
+        /// <param name="expression"></param>
+        /// <param name="value"></param>
+        /// <exception cref="InvalidOperationException"></exception>
+        public static void SetValue(Expression<Func<Tval>> expression, Tval value)
+        {
+            if (expression.Body is not MemberExpression member)
+            {
+                throw new InvalidOperationException("Not supported.");
+            }
+            var inst = GetInstanceHelper(member);
+            var exp = member.Member;
+            switch (exp)
+            {
+                case FieldInfo field:
+                    field.SetValue(inst, value);
+                    break;
+                case PropertyInfo property:
+                    property.SetValue(inst, value);
+                    break;
+                default:
+                    throw new InvalidOperationException("No support member");
+            }
+        }
+        /// <summary>
+        /// インスタンスの取得
+        /// </summary>
+        /// <param name="memberExpression"></param>
+        /// <returns></returns>
+        public static object? GetInstanceHelper(MemberExpression memberExpression)
+        {
+            return memberExpression.Expression switch
+            {
+                ConstantExpression constantExpression => constantExpression.Value,
+                MemberExpression member => GetInstanceHelper(member),
+                _ => null
+            };
+        }
     }
 }
