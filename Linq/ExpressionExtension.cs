@@ -170,5 +170,59 @@ namespace LinqExtenssions
                 _ => null
             };
         }
+        public static Func<TOwner, TOptionType> BuildGetter<TOwner, TOptionType>(Expression<Func<TOwner, TOptionType>> propertyExpression)
+        {
+            return propertyExpression.Compile();
+        }
+
+        public static Action<TOwner, TOptionType> BuildSetter<TOwner, TOptionType>(Expression<Func<TOwner, TOptionType>> propertyExpression)
+        {
+            if (propertyExpression.Body is not MemberExpression memberExpr)
+                throw new ArgumentException("Expression must be a MemberExpression", nameof(propertyExpression));
+
+            // 右辺: value（代入する値）
+            var valueParam = Expression.Parameter(typeof(TOptionType), "value");
+
+            // 左辺の最も深いプロパティ（例: Baz）を探す
+            var memberStack = new Stack<MemberExpression>();
+            Expression? current = memberExpr;
+
+            while (current is MemberExpression m)
+            {
+                memberStack.Push(m);
+                current = m.Expression;
+            }
+
+            if (memberStack.Count == 0)
+                throw new ArgumentException("No valid member expression found", nameof(propertyExpression));
+
+            // 所有者（TOwner）のパラメータ（例: x）
+            var ownerParam = propertyExpression.Parameters[0];
+
+            // 左辺の構築（ネストされたオブジェクトのプロパティアクセスを構築）
+            Expression? targetExpr = ownerParam;
+            while (memberStack.Count > 1) // 最後は setter の対象なので飛ばす
+            {
+                var m = memberStack.Pop();
+                targetExpr = Expression.MakeMemberAccess(targetExpr, m.Member);
+            }
+
+            var finalMember = memberStack.Pop();
+            if (finalMember.Member is not PropertyInfo finalProp)
+                throw new ArgumentException("The final member is not a property.", nameof(propertyExpression));
+
+            var setterMethod = finalProp.GetSetMethod(nonPublic: false);
+            if (setterMethod == null)
+                throw new InvalidOperationException($"Property '{finalProp.Name}' does not have a public setter.");
+
+            // 左辺: targetExpr.FinalProperty = value
+            var assignExpr = Expression.Assign(
+                Expression.Property(targetExpr!, finalProp),
+                valueParam
+            );
+
+            var lambda = Expression.Lambda<Action<TOwner, TOptionType>>(assignExpr, ownerParam, valueParam);
+            return lambda.Compile();
+        }
     }
 }
