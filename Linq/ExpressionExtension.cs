@@ -17,22 +17,24 @@ namespace LinqExtenssions
         /// <returns></returns>
         public static string GetPropertyPathStr<T>(Expression<Func<T, object>> member) where T : class
         {
-            Expression? expression = null;
-            if (member.Body is MemberExpression)
+            var expression = member.Body switch
             {
-                expression = (MemberExpression)member.Body;
-            }
-            else if (member.Body is UnaryExpression)
-            {
-                var mb = (UnaryExpression)member.Body;
-                expression = mb.Operand;
-            }
+                MemberExpression m => m,
+                UnaryExpression u => u.Operand,
+                _ => null
+            };
+
             if (expression == null) return "";
 
-            var list = ExpressionRecursive(expression);
+            var stack = new Stack<string>();
 
-            var strBuffers = list.Reverse().Select(a => a.Member.Name).ToArray();
-            return string.Join(".", strBuffers);
+            while (expression is MemberExpression memberExpr)
+            {
+                stack.Push(memberExpr.Member.Name);
+                expression = memberExpr.Expression!;
+            }
+
+            return string.Join(".", stack);
         }
         /// <summary>
         /// メンバーパスからプロパティインフォ取得
@@ -74,23 +76,6 @@ namespace LinqExtenssions
                 body = Expression.PropertyOrField(body, member);
             };
             return body;
-        }
-        /// <summary>
-        /// メンバー式取得の再帰
-        /// </summary>
-        /// <param name="expresion"></param>
-        /// <returns></returns>
-        public static IEnumerable<MemberExpression> ExpressionRecursive(Expression expresion)
-        {
-            if (expresion is MemberExpression member && member != null)
-            {
-                if (member.Expression == null) yield break;
-                yield return member;
-                var list = ExpressionRecursive(member.Expression);
-                foreach (var item in list)
-                    yield return item;
-            }
-            yield break;
         }
         /// <summary>
         /// インスタンスとパスから、子プロパティを含めて検索してオブジェクトを取り出す
